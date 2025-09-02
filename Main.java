@@ -1,45 +1,56 @@
-import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        // 빠른 입력을 위한 BufferedReader
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        // 빠른 출력을 위한 StringBuilder
-        StringBuilder sb = new StringBuilder();
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
 
-        int N = Integer.parseInt(br.readLine()); // 명령의 개수
+        int N = sc.nextInt();
+
+        // 원래 줄 (큐)
+        Queue<Integer> line = new ArrayDeque<>();
+        for (int i = 0; i < N; i++) {
+            line.add(sc.nextInt());
+        }
+
+        // 보조 공간 (스택)
         Stack<Integer> stack = new Stack<>();
 
-        for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int cmd = Integer.parseInt(st.nextToken());
+        int next = 1; // 지금 간식 받아야 할 번호
 
-            switch (cmd) {
-                case 1: // 1 X: 정수 X를 스택에 넣는다
-                    int x = Integer.parseInt(st.nextToken());
-                    stack.push(x);
-                    break;
+        // 줄이 빌 때까지 반복
+        while (!line.isEmpty()) {
+            int curr = line.poll(); // 줄에서 한 명 꺼냄
 
-                case 2: // pop
-                    sb.append(stack.isEmpty() ? -1 : stack.pop()).append("\n");
-                    break;
+            if (curr == next) {
+                // 바로 간식 받을 수 있으면
+                next++;
+            } else {
+                // 보조 스택 확인
+                while (!stack.isEmpty() && stack.peek() == next) {
+                    stack.pop();
+                    next++;
+                }
 
-                case 3: // size
-                    sb.append(stack.size()).append("\n");
-                    break;
-
-                case 4: // empty
-                    sb.append(stack.isEmpty() ? 1 : 0).append("\n");
-                    break;
-
-                case 5: // top
-                    sb.append(stack.isEmpty() ? -1 : stack.peek()).append("\n");
-                    break;
+                // 그래도 curr이 next랑 다르면 → 스택에 넣음
+                if (curr != next) {
+                    stack.push(curr);
+                } else {
+                    next++;
+                }
             }
         }
 
-        // 결과 한 번에 출력
-        System.out.print(sb);
+        // 줄이 다 끝난 뒤, 스택에 남은 애들도 확인
+        while (!stack.isEmpty() && stack.peek() == next) {
+            stack.pop();
+            next++;
+        }
+
+        // 모두 처리했으면 next == N+1
+        if (next == N + 1) {
+            System.out.println("Nice");
+        } else {
+            System.out.println("Sad");
+        }
     }
 }

@@ -52,7 +52,7 @@ public class Backjun28278 {
                     sb.append(stack.isEmpty()? -1 : stack.peek()).append("\n");
                     break;
 
-            }
+            } 
         }
 
         System.out.print(sb);
