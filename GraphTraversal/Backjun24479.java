@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
-public class Backjun_24480 {
+public class Backjun24479 {
     
     static ArrayList<Integer>[] graph;
     static int[] visited;
@@ -38,9 +38,9 @@ public class Backjun_24480 {
             graph[v].add(u);
         }
 
-        // 내림차순 정렬
+        // 오름차순 정렬
         for (int i = 1; i <= N; i++) {
-            graph[i].sort(Collections.reverseOrder());
+            Collections.sort(graph[i]);
         }
 
         // DFS 시작
@@ -58,7 +58,7 @@ public class Backjun_24480 {
         visited[node] = order++; // 방문 순서 기록
 
         for (int next : graph[node]) {
-            if (visited[next] == 0) {
+            if (visited[next] == 0) { // 아직 방문 안 했으면
                 dfs(next);
             }
         }

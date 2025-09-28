@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class Backjun_24444 {
+public class Backjun24445 {
     
     static ArrayList<Integer>[] graph;
     static int[] visited;
@@ -40,15 +40,14 @@ public class Backjun_24444 {
             graph[v].add(u);
         }
 
-        // 인접 정점 오름차순 정렬
+        // 인접 정점 내림차순 정렬
         for (int i = 1; i <= N; i++) {
-            Collections.sort(graph[i]);
+            graph[i].sort(Comparator.reverseOrder());
         }
 
-        // BFS 시작
         bfs(R);
 
-        // 결과 출력
+        // 출력
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= N; i++) {
             sb.append(visited[i]).append("\n");

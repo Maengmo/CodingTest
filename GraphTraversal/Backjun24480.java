@@ -4,12 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Collections;
 import java.util.StringTokenizer;
 
-public class Backjun_24445 {
+public class Backjun24480 {
     
     static ArrayList<Integer>[] graph;
     static int[] visited;
@@ -40,14 +38,15 @@ public class Backjun_24445 {
             graph[v].add(u);
         }
 
-        // 인접 정점 내림차순 정렬
+        // 내림차순 정렬
         for (int i = 1; i <= N; i++) {
-            graph[i].sort(Comparator.reverseOrder());
+            graph[i].sort(Collections.reverseOrder());
         }
 
-        bfs(R);
+        // DFS 시작
+        dfs(R);
 
-        // 출력
+        // 결과 출력
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= N; i++) {
             sb.append(visited[i]).append("\n");
@@ -55,19 +54,12 @@ public class Backjun_24445 {
         System.out.print(sb);
     }
 
-    static void bfs(int start) {
-        Queue<Integer> queue = new LinkedList<>();
-        visited[start] = order++;
-        queue.add(start);
+    static void dfs(int node) {
+        visited[node] = order++; // 방문 순서 기록
 
-        while (!queue.isEmpty()) {
-            int cur = queue.poll();
-
-            for (int next : graph[cur]) {
-                if (visited[next] == 0) {
-                    visited[next] = order++;
-                    queue.add(next);
-                }
+        for (int next : graph[node]) {
+            if (visited[next] == 0) {
+                dfs(next);
             }
         }
     }
