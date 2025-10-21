@@ -1,99 +1,106 @@
 package OpenShortestPath;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Backjun9370 {
-    static class Node implements Comparable<Node> {
-        int v, w;
-        Node(int v, int w) {
-            this.v = v;
-            this.w = w;
+   static class FastScanner {
+        BufferedReader br;
+        StringTokenizer st;
+        FastScanner(InputStream is) { br = new BufferedReader(new InputStreamReader(is)); }
+        String next() throws IOException {
+            while (st == null || !st.hasMoreTokens()) {
+                String line = br.readLine();
+                if (line == null) return null;
+                st = new StringTokenizer(line);
+            }
+            return st.nextToken();
         }
-        public int compareTo(Node o) {
-            return this.w - o.w;
-        }
+        int nextInt() throws IOException { return Integer.parseInt(next()); }
+        long nextLong() throws IOException { return Long.parseLong(next()); }
     }
 
-    static final int INF = Integer.MAX_VALUE;
+    static class Edge {
+        int to;
+        int w;
+        Edge(int to, int w) { this.to = to; this.w = w; }
+    }
 
-    static int n, m, t, s, g, h;
-    static List<Node>[] adj;
+    static class Node implements Comparable<Node> {
+        int v;
+        long dist;
+        Node(int v, long dist) { this.v = v; this.dist = dist; }
+        public int compareTo(Node o) { return Long.compare(this.dist, o.dist); }
+    }
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws Exception {
+        FastScanner fs = new FastScanner(System.in);
         StringBuilder sb = new StringBuilder();
-        int T = Integer.parseInt(br.readLine());
 
+        int T = fs.nextInt();
         while (T-- > 0) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            n = Integer.parseInt(st.nextToken());
-            m = Integer.parseInt(st.nextToken());
-            t = Integer.parseInt(st.nextToken());
+            int n = fs.nextInt();
+            int m = fs.nextInt();
+            int t = fs.nextInt();
 
-            st = new StringTokenizer(br.readLine());
-            s = Integer.parseInt(st.nextToken());
-            g = Integer.parseInt(st.nextToken());
-            h = Integer.parseInt(st.nextToken());
+            int s = fs.nextInt();
+            int g = fs.nextInt();
+            int h = fs.nextInt();
 
-            adj = new ArrayList[n + 1];
+            List<Edge>[] adj = new ArrayList[n+1];
             for (int i = 1; i <= n; i++) adj[i] = new ArrayList<>();
 
             for (int i = 0; i < m; i++) {
-                st = new StringTokenizer(br.readLine());
-                int a = Integer.parseInt(st.nextToken());
-                int b = Integer.parseInt(st.nextToken());
-                int d = Integer.parseInt(st.nextToken());
-
-                int weight = 2 * d;
-                if ((a == g && b == h) || (a == h && b == g))
-                    weight = 2 * d - 1; // g-h 간선만 홀수
-
-                adj[a].add(new Node(b, weight));
-                adj[b].add(new Node(a, weight));
+                int a = fs.nextInt();
+                int b = fs.nextInt();
+                int d = fs.nextInt();
+                int w = 2 * d;
+                if ((a == g && b == h) || (a == h && b == g)) {
+                    w = 2 * d - 1; // g-h 간선만 홀수
+                }
+                adj[a].add(new Edge(b, w));
+                adj[b].add(new Edge(a, w));
             }
 
-            int[] dist = dijkstra(s);
+            // read t candidate destinations
+            int[] candidates = new int[t];
+            for (int i = 0; i < t; i++) candidates[i] = fs.nextInt();
 
-            List<Integer> candidates = new ArrayList<>();
-            for (int i = 0; i < t; i++) {
-                int x = Integer.parseInt(br.readLine());
-                if (dist[x] % 2 == 1) { // 홀수라면 g-h를 지난 경로
-                    candidates.add(x);
+            long[] dist = dijkstra(n, adj, s);
+
+            List<Integer> ans = new ArrayList<>();
+            for (int x : candidates) {
+                if (dist[x] != Long.MAX_VALUE && (dist[x] % 2 == 1)) {
+                    ans.add(x);
                 }
             }
-
-            Collections.sort(candidates);
-            for (int x : candidates) sb.append(x).append(' ');
+            Collections.sort(ans);
+            for (int i = 0; i < ans.size(); i++) {
+                if (i > 0) sb.append(' ');
+                sb.append(ans.get(i));
+            }
             sb.append('\n');
         }
 
-        System.out.print(sb);
+        System.out.print(sb.toString());
     }
 
-    static int[] dijkstra(int start) {
-        int[] dist = new int[n + 1];
+    static long[] dijkstra(int n, List<Edge>[] adj, int start) {
+        long INF = Long.MAX_VALUE;
+        long[] dist = new long[n+1];
         Arrays.fill(dist, INF);
         PriorityQueue<Node> pq = new PriorityQueue<>();
         dist[start] = 0;
-        pq.add(new Node(start, 0));
+        pq.add(new Node(start, 0L));
 
         while (!pq.isEmpty()) {
             Node cur = pq.poll();
-            if (cur.w > dist[cur.v]) continue;
-
-            for (Node nxt : adj[cur.v]) {
-                int nd = cur.w + nxt.w;
-                if (nd < dist[nxt.v]) {
-                    dist[nxt.v] = nd;
-                    pq.add(new Node(nxt.v, nd));
+            if (cur.dist != dist[cur.v]) continue;
+            for (Edge e : adj[cur.v]) {
+                long nd = cur.dist + e.w;
+                if (nd < dist[e.to]) {
+                    dist[e.to] = nd;
+                    pq.add(new Node(e.to, nd));
                 }
             }
         }
